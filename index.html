@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ MEGA DRAW PRO · 30+ FUNKSIYA ✨</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0a10;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        /* asosiy konteyner */
+        .app-container {
+            width: 100%;
+            max-width: 1800px;
+            height: 100%;
+            display: flex;
+            gap: 18px;
+        }
+
+        /* ========== KAMERA QISMI (CHAP) ========== */
+        .camera-wrapper {
+            flex: 2.3;
+            background: #0e0e15;
+            border-radius: 28px;
+            border: 1px solid #252530;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .camera-header {
+            background: #0a0a12;
+            padding: 16px 22px;
+            border-bottom: 1px solid #252530;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .live-badge {
+            background: #ff2a5c;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 12px #ff2a5c55;
+        }
+
+        .live-badge i {
+            font-size: 12px;
+            animation: pulse 1s infinite;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-chip {
+            background: #181822;
+            border: 1px solid #303040;
+            border-radius: 40px;
+            padding: 6px 16px;
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-chip i {
+            color: #9f9fff;
+            width: 18px;
+        }
+
+        /* video joyi */
+        .video-box {
+            position: relative;
+            flex: 1;
+            background: #000;
+            min-height: 0;
+        }
+
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+            opacity: 0.25;
+        }
+
+        #canvasOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+            mix-blend-mode: screen;
+        }
+
+        .camera-footer {
+            background: #0a0a12;
+            border-top: 1px solid #252530;
+            padding: 14px 22px;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            color: white;
+        }
+
+        .hand-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #444;
+        }
+        .led.on { background: #30e680; box-shadow: 0 0 15px #30e680; }
+        .coord-panel {
+            background: #181822;
+            border-radius: 40px;
+            padding: 6px 20px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #303040;
+        }
+
+        /* ========== O'NG PANEL (FUNKSIYALAR) ========== */
+        .right-panel {
+            flex: 1.2;
+            min-width: 400px;
+            background: #0e0e15;
+            border-radius: 28px;
+            border: 1px solid #252530;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        /* Scrollbar chiroyli */
+        .right-panel::-webkit-scrollbar { width: 5px; }
+        .right-panel::-webkit-scrollbar-track { background: #1a1a25; border-radius: 10px; }
+        .right-panel::-webkit-scrollbar-thumb { background: #3f3f60; border-radius: 10px; }
+
+        /* KARTALAR */
+        .card {
+            background: #14141f;
+            border-radius: 24px;
+            border: 1px solid #2a2a38;
+            padding: 20px;
+            transition: 0.1s ease;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            border-bottom: 1px solid #2a2a38;
+            padding-bottom: 12px;
+        }
+
+        .card-header i {
+            font-size: 22px;
+            width: 32px;
+            color: #ffd966;
+        }
+
+        .card-header span {
+            color: #aaa;
+            font-size: 13px;
+            margin-left: auto;
+        }
+
+        /* status grid 4ta */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .status-tile {
+            background: #1d1d2b;
+            border-radius: 18px;
+            padding: 12px 5px;
+            text-align: center;
+            border: 1px solid #333342;
+        }
+
+        .status-tile i {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #b0b0ff;
+        }
+        .status-tile .label {
+            font-size: 11px;
+            color: #9a9ab0;
+        }
+        .status-tile .value {
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .big-row {
+            background: #1d1d2b;
+            border-radius: 18px;
+            padding: 16px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #333342;
+            color: white;
+            font-size: 18px;
+            font-family: monospace;
+        }
+
+        /* RANGLAR – 12 TA */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        .color-item {
+            aspect-ratio: 1/1;
+            border-radius: 16px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.1s ease;
+            box-shadow: 0 4px 8px black;
+        }
+        .color-item:hover { transform: scale(1.05); border-color: white; }
+        .color-item.active { border-color: white; box-shadow: 0 0 25px currentColor; }
+
+        /* sliderlar */
+        .slider-group {
+            margin-bottom: 18px;
+        }
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            color: #c0c0e0;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .slider-header .value-badge {
+            background: #1d1d2b;
+            padding: 4px 14px;
+            border-radius: 30px;
+            border: 1px solid #40405a;
+            color: white;
+        }
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            background: #262636;
+            border-radius: 3px;
+            -webkit-appearance: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid black;
+            cursor: pointer;
+        }
+
+        /* toggle switch */
+        .switch-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1d1d2b;
+            border-radius: 20px;
+            padding: 12px 16px;
+            border: 1px solid #333342;
+            margin-bottom: 12px;
+        }
+        .switch-group label { color: white; display: flex; gap: 10px; align-items: center; }
+        .switch { width: 50px; height: 26px; background: #333; border-radius: 30px; position: relative; cursor: pointer; }
+        .switch:before {
+            content: '';
+            position: absolute;
+            width: 22px; height: 22px; background: white; border-radius: 50%;
+            top: 2px; left: 2px; transition: 0.1s;
+        }
+        .switch.active { background: #ff3b5c; }
+        .switch.active:before { left: 26px; }
+
+        /* tugmalar grid */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .btn {
+            background: #20202e;
+            border: 1px solid #3a3a4a;
+            color: white;
+            padding: 14px 5px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.1s ease;
+        }
+        .btn i { font-size: 20px; }
+        .btn:hover { background: #2d2d40; transform: translateY(-2px); }
+        .btn-primary { background: #ff3b5c; border-color: #ff7a8f; }
+        .btn-success { background: #2ecc80; border-color: #5fdfa3; }
+        .btn-warning { background: #f5b342; border-color: #ffcf70; color: #000; }
+
+        /* rasm yuklash */
+        .upload-area {
+            background: #1d1d2b;
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 2px dashed #4a4a60;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .upload-area i { font-size: 26px; color: #ffd966; }
+
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- CHAP: KAMERA -->
+        <div class="camera-wrapper">
+            <div class="camera-header">
+                <div class="live-badge">
+                    <i class="fas fa-circle"></i> LIVE CAM
+                </div>
+                <div class="stats-row">
+                    <div class="stat-chip"><i class="fas fa-microchip"></i> <span id="fpsDisplay">60</span> FPS</div>
+                    <div class="stat-chip"><i class="fas fa-paint-brush"></i> <span id="pointsCount">0</span></div>
+                </div>
+            </div>
+            <div class="video-box">
+                <video id="videoElement" playsinline></video>
+                <canvas id="canvasOverlay"></canvas>
+            </div>
+            <div class="camera-footer">
+                <div class="hand-indicator"><i class="fas fa-hand"></i> <span id="handStatusText">Yo'q</span> <span class="led" id="handLed"></span></div>
+                <div class="hand-indicator"><i class="fas fa-fingerprint"></i> <span id="gestStatusText">✗</span> <span class="led" id="gestLed"></span></div>
+                <div class="coord-panel" id="coordLive">(0,0)</div>
+            </div>
+        </div>
+
+        <!-- O'NG: 30+ FUNKSIYA -->
+        <div class="right-panel">
+            <!-- STATUS KARTA -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-chart-pie"></i> LIVE STATUS <span>real-time</span></div>
+                <div class="status-grid">
+                    <div class="status-tile"><i class="fas fa-hand"></i><div class="label">Qo'l</div><div class="value" id="handVal">—</div></div>
+                    <div class="status-tile"><i class="fas fa-hand-point-up"></i><div class="label">Gest</div><div class="value" id="gestVal">✗</div></div>
+                    <div class="status-tile"><i class="fas fa-clock"></i><div class="label">Vaqt</div><div class="value" id="timeVal">0:00</div></div>
+                    <div class="status-tile"><i class="fas fa-arrow-pointer"></i><div class="label">Nuqta</div><div class="value" id="ptVal">0</div></div>
+                </div>
+                <div class="big-row"><span><i class="fas fa-location-dot"></i> Koordinata</span> <span id="coordBig">(0,0)</span></div>
+            </div>
+
+            <!-- 12 RANG -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-palette"></i> 12 NEON RANG <span>yaltiroq</span></div>
+                <div class="color-grid">
+                    <div class="color-item active" style="background:#ff3b5c" onclick="setColor('#ff3b5c',this)"></div>
+                    <div class="color-item" style="background:#30e680" onclick="setColor('#30e680',this)"></div>
+                    <div class="color-item" style="background:#3b80ff" onclick="setColor('#3b80ff',this)"></div>
+                    <div class="color-item" style="background:#ffd966" onclick="setColor('#ffd966',this)"></div>
+                    <div class="color-item" style="background:#cc73ff" onclick="setColor('#cc73ff',this)"></div>
+                    <div class="color-item" style="background:#00e0e0" onclick="setColor('#00e0e0',this)"></div>
+                    <div class="color-item" style="background:#ff9f4b" onclick="setColor('#ff9f4b',this)"></div>
+                    <div class="color-item" style="background:#ff99cc" onclick="setColor('#ff99cc',this)"></div>
+                    <div class="color-item" style="background:#ff0000" onclick="setColor('#ff0000',this)"></div>
+                    <div class="color-item" style="background:#00ffaa" onclick="setColor('#00ffaa',this)"></div>
+                    <div class="color-item" style="background:#aa80ff" onclick="setColor('#aa80ff',this)"></div>
+                    <div class="color-item" style="background:#ffffff" onclick="setColor('#ffffff',this)"></div>
+                </div>
+            </div>
+
+            <!-- SLAYDERLAR 6 TA -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-sliders"></i> 6 TA SOZLAMA</div>
+                <div class="slider-group"><div class="slider-header"><span><i class="fas fa-pencil"></i> Qalinlik</span><span class="value-badge" id="sizeLabel">16px</span></div><input type="range" id="brushSize" min="2" max="60" value="16"></div>
+                <div class="slider-group"><div class="slider-header"><span><i class="fas fa-sun"></i> Yaltiroqlik</span><span class="value-badge" id="glowLabel">28px</span></div><input type="range" id="glowSize" min="0" max="80" value="28"></div>
+                <div class="slider-group"><div class="slider-header"><span><i class="fas fa-wind"></i> So'nish</span><span class="value-badge" id="fadeLabel">0.97</span></div><input type="range" id="fadeSpeed" min="0.92" max="0.99" step="0.01" value="0.97"></div>
+                <div class="slider-group"><div class="slider-header"><span><i class="fas fa-arrow-left-long"></i> Iz uzunligi</span><span class="value-badge" id="trailLabel">120%</span></div><input type="range" id="trailFactor" min="30" max="250" value="120"></div>
+                <div class="slider-group"><div class="slider-header"><span><i class="fas fa-droplet"></i> Opasity</span><span class="value-badge" id="opacityLabel">1.0</span></div><input type="range" id="opacityVal" min="0.3" max="1" step="0.01" value="1"></div>
+                <div class="slider-group"><div class="slider-header"><span><i class="fas fa-expand"></i> Nuqta kattaligi</span><span class="value-badge" id="dotLabel">10px</span></div><input type="range" id="dotSize" min="2" max="40" value="10"></div>
+            </div>
+
+            <!-- TOGGLELAR 4 TA -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-toggle-on"></i> REJIMLAR</div>
+                <div class="switch-group"><label><i class="fas fa-draw-polygon"></i> Chizish</label> <div class="switch active" id="toggleDrawSwitch" onclick="toggleDrawSwitch()"></div></div>
+                <div class="switch-group"><label><i class="fas fa-ghost"></i> Faqat iz</label> <div class="switch" id="toggleTrailSwitch" onclick="toggleTrail()"></div></div>
+                <div class="switch-group"><label><i class="fas fa-flip-horizontal"></i> Oyna effekti</label> <div class="switch active" id="mirrorSwitch" onclick="toggleMirror()"></div></div>
+                <div class="switch-group"><label><i class="fas fa-grid"></i> Qo'l nuqtalari</label> <div class="switch active" id="handPointsSwitch" onclick="toggleHandPoints()"></div></div>
+            </div>
+
+            <!-- 12 TA TUGMA -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-keyboard"></i> 12 TEZKOR TUGMA</div>
+                <div class="button-grid">
+                    <div class="btn btn-primary" onclick="toggleDraw()"><i class="fas fa-play-pause"></i> Start/Stop</div>
+                    <div class="btn btn-success" onclick="saveCanvas()"><i class="fas fa-camera"></i> Saqlash</div>
+                    <div class="btn btn-warning" onclick="clearCanvas()"><i class="fas fa-trash"></i> Tozalash</div>
+                    <div class="btn" onclick="resetAll()"><i class="fas fa-undo-alt"></i> Reset</div>
+                    <div class="btn" onclick="bgBlack()"><i class="fas fa-moon"></i> Qora fon</div>
+                    <div class="btn" onclick="bgWhite()"><i class="fas fa-sun"></i> Oq fon</div>
+                    <div class="btn" onclick="addSmiley()"><i class="fas fa-face-smile"></i> Smayl</div>
+                    <div class="btn" onclick="addStar()"><i class="fas fa-star"></i> Yulduz</div>
+                    <div class="btn" onclick="randomColor()"><i class="fas fa-shuffle"></i> Rand rang</div>
+                    <div class="btn" onclick="thickLine()"><i class="fas fa-arrow-up-wide-short"></i> Qalin+</div>
+                    <div class="btn" onclick="thinLine()"><i class="fas fa-arrow-down-wide-short"></i> Yupqa-</div>
+                    <div class="btn" onclick="glowUp()"><i class="fas fa-bolt"></i> Glow++</div>
+                </div>
+            </div>
+
+            <!-- RASM YUKLASH / TASVIRLAR -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-image"></i> RASM YUKLASH</div>
+                <div class="upload-area" onclick="document.getElementById('uploadImg').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Rasm tanlang (PNG/JPG)</p>
+                    <input type="file" id="uploadImg" accept="image/*" hidden onchange="loadImage(event)">
+                </div>
+                <div style="display:flex; gap:8px; margin-top:12px;">
+                    <div class="btn" style="flex:1;" onclick="placeSticker('heart')"><i class="fas fa-heart"></i> Yurak</div>
+                    <div class="btn" style="flex:1;" onclick="placeSticker('cat')"><i class="fas fa-cat"></i> Mushuk</div>
+                    <div class="btn" style="flex:1;" onclick="placeSticker('rocket')"><i class="fas fa-rocket"></i> Raketa</div>
+                </div>
+            </div>
+
+            <!-- MA'LUMOT -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-circle-info"></i> QO'LLANMA</div>
+                <div style="color:#b0b0d0; font-size:14px; line-height:1.7">
+                    <i class="fas fa-check-circle" style="color:#30e680;"></i> Ko'rsatkich barmoq cho'zing<br>
+                    <i class="fas fa-check-circle" style="color:#30e680;"></i> Qolgan barmoqlar bukilsin<br>
+                    <i class="fas fa-check-circle" style="color:#30e680;"></i> 30+ funksiya, 12 rang, 6 effekt<br>
+                    <i class="fas fa-check-circle" style="color:#30e680;"></i> Rasm yuklang, sticker qo'ying
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // --- ELEMENTLAR ---
+            const video = document.getElementById('videoElement');
+            const canvas = document.getElementById('canvasOverlay');
+            const ctx = canvas.getContext('2d', { alpha: false });
+            canvas.width = 1280; canvas.height = 720;
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // --- SOZLAMALAR (TEZ ISHLASH UCHUN) ---
+            let isDrawing = true;
+            let lastX = null, lastY = null;
+            let currentColor = '#ff3b5c';
+            let brushSize = 16;
+            let glowSize = 28;
+            let fadeSpeed = 0.97;
+            let trailFactor = 120; // %
+            let globalAlpha = 1.0;
+            let dotSize = 10;
+
+            // qoshimcha rejimlar
+            let trailMode = false;      // faqat iz
+            let mirror = true;
+            let showHandPoints = true;
+
+            let handPresent = false;
+            let fingerOK = false;
+            let points = [];
+
+            // rasm yuklash uchun
+            let uploadedImage = null;
+
+            // VAQT
+            let startTime = Date.now();
+            let lastFrameTime = performance.now();
+
+            // ---- MEDIAPIPE (tezligi oshirilgan) ----
+            const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+            hands.setOptions({ maxNumHands:1, modelComplexity:0, minDetectionConfidence:0.5, minTrackingConfidence:0.5 });
+            hands.onResults(onHandResults);
+
+            const camera = new Camera(video, {
+                onFrame: async () => { await hands.send({image: video}); },
+                width: 1280, height: 720
+            });
+            camera.start().catch(e=>alert("Kamera ruxsati kerak"));
+
+            // --- FADE FUNKSIYASI (tez) ---
+            function applyFade() {
+                const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const d = img.data;
+                for (let i=0; i<d.length; i+=4) {
+                    d[i]   = Math.floor(d[i] * fadeSpeed);
+                    d[i+1] = Math.floor(d[i+1] * fadeSpeed);
+                    d[i+2] = Math.floor(d[i+2] * fadeSpeed);
+                }
+                ctx.putImageData(img, 0, 0);
+            }
+
+            // --- HAND RESULTS (qotib qolmasligi uchun optimallangan)---
+            function onHandResults(results) {
+                const now = performance.now();
+                const fps = Math.round(1000 / (now - lastFrameTime));
+                if (fps>0) document.getElementById('fpsDisplay').innerText = fps;
+                lastFrameTime = now;
+
+                // vaqt
+                const sec = Math.floor((Date.now()-startTime)/1000);
+                document.getElementById('timeVal').innerText = Math.floor(sec/60)+':'+(sec%60).toString().padStart(2,'0');
+
+                // fade
+                applyFade();
+
+                if (results.multiHandLandmarks && results.multiHandLandmarks.length>0) {
+                    handPresent = true;
+                    const lm = results.multiHandLandmarks[0];
+                    const tip = lm[8];
+                    let x = tip.x * canvas.width;
+                    let y = tip.y * canvas.height;
+
+                    // koordinata
+                    document.getElementById('coordLive').innerText = `(${Math.round(x)},${Math.round(y)})`;
+                    document.getElementById('coordBig').innerText = `(${Math.round(x)},${Math.round(y)})`;
+                    document.getElementById('handVal').innerText = 'TOPILDI';
+                    document.getElementById('handStatusText').innerText = 'Topildi';
+                    document.getElementById('handLed').className = 'led on';
+                    document.getElementById('ptVal').innerText = points.length;
+                    document.getElementById('pointsCount').innerText = points.length;
+
+                    // gest tekshirish
+                    const idxTip = lm[8], idxPip = lm[6], midTip=lm[12], rinTip=lm[16], pinTip=lm[20];
+                    const midMcp=lm[9], rinMcp=lm[13], pinMcp=lm[17];
+                    const idxExt = idxTip.y < idxPip.y;
+                    const midBent = midTip.y > midMcp.y;
+                    const rinBent = rinTip.y > rinMcp.y;
+                    const pinBent = pinTip.y > pinMcp.y;
+                    fingerOK = idxExt && midBent && rinBent && pinBent;
+
+                    if (fingerOK) {
+                        document.getElementById('gestVal').innerText = '✓';
+                        document.getElementById('gestStatusText').innerText = 'Chizish';
+                        document.getElementById('gestLed').className = 'led on';
+                    } else {
+                        document.getElementById('gestVal').innerText = '✗';
+                        document.getElementById('gestStatusText').innerText = '✗';
+                        document.getElementById('gestLed').className = 'led';
+                    }
+
+                    // chizish
+                    if (isDrawing && fingerOK && !trailMode) {
+                        if (lastX!==null && lastY!==null) {
+                            const dist = Math.hypot(x-lastX, y-lastY);
+                            if (dist < 200) {
+                                ctx.globalAlpha = globalAlpha;
+                                ctx.shadowColor = currentColor;
+                                ctx.shadowBlur = glowSize;
+                                ctx.lineWidth = brushSize;
+                                ctx.strokeStyle = currentColor;
+                                ctx.beginPath();
+                                ctx.moveTo(lastX, lastY);
+                                ctx.lineTo(x, y);
+                                ctx.stroke();
+
+                                points.push({x,y});
+                                if (points.length > 150) points.shift();
+                            }
+                        }
+                        lastX = x; lastY = y;
+                    } else {
+                        lastX = lastY = null;
+                    }
+
+                    // barmoq uchi nuqtasi
+                    ctx.shadowBlur = glowSize*1.8;
+                    ctx.shadowColor = currentColor;
+                    ctx.beginPath();
+                    ctx.arc(x, y, dotSize, 0, 2*Math.PI);
+                    ctx.fillStyle = currentColor;
+                    ctx.fill();
+
+                    // qo'l nuqtalari (ixtiyoriy)
+                    if (showHandPoints) {
+                        ctx.shadowBlur = 8;
+                        ctx.shadowColor = '#aaa';
+                        for (let i=0; i<lm.length; i++) {
+                            let px = lm[i].x * canvas.width;
+                            let py = lm[i].y * canvas.height;
+                            ctx.beginPath();
+                            ctx.arc(px, py, 4, 0, 2*Math.PI);
+                            ctx.fillStyle = '#3b80ff80';
+                            ctx.fill();
+                        }
+                    }
+
+                } else {
+                    handPresent = false; fingerOK=false; lastX=null; lastY=null;
+                    document.getElementById('handVal').innerText = '—';
+                    document.getElementById('handStatusText').innerText = 'Yoʻq';
+                    document.getElementById('handLed').className = 'led';
+                    document.getElementById('gestVal').innerText = '✗';
+                    document.getElementById('gestStatusText').innerText = '✗';
+                    document.getElementById('gestLed').className = 'led';
+                }
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1.0;
+            }
+
+            // ---- UI FUNKSIYALARI (hammasi tez) ----
+            window.setColor = (c, el) => {
+                currentColor = c;
+                document.querySelectorAll('.color-item').forEach(x=>x.classList.remove('active'));
+                el.classList.add('active');
+            };
+
+            // slayderlar
+            document.getElementById('brushSize').addEventListener('input', e => { brushSize = +e.target.value; document.getElementById('sizeLabel').innerText = brushSize+'px'; });
+            document.getElementById('glowSize').addEventListener('input', e => { glowSize = +e.target.value; document.getElementById('glowLabel').innerText = glowSize+'px'; });
+            document.getElementById('fadeSpeed').addEventListener('input', e => { fadeSpeed = +e.target.value; document.getElementById('fadeLabel').innerText = fadeSpeed.toFixed(2); });
+            document.getElementById('trailFactor').addEventListener('input', e => { trailFactor = +e.target.value; document.getElementById('trailLabel').innerText = trailFactor+'%'; });
+            document.getElementById('opacityVal').addEventListener('input', e => { globalAlpha = +e.target.value; document.getElementById('opacityLabel').innerText = globalAlpha.toFixed(2); });
+            document.getElementById('dotSize').addEventListener('input', e => { dotSize = +e.target.value; document.getElementById('dotLabel').innerText = dotSize+'px'; });
+
+            // toggle switchlar
+            window.toggleDrawSwitch = () => {
+                let sw = document.getElementById('toggleDrawSwitch');
+                sw.classList.toggle('active');
+                isDrawing = sw.classList.contains('active');
+            };
+            window.toggleTrail = () => {
+                let sw = document.getElementById('toggleTrailSwitch');
+                sw.classList.toggle('active');
+                trailMode = sw.classList.contains('active');
+            };
+            window.toggleMirror = () => {
+                let sw = document.getElementById('mirrorSwitch');
+                sw.classList.toggle('active');
+                mirror = sw.classList.contains('active');
+                canvas.style.transform = mirror ? 'scaleX(-1)' : 'none';
+            };
+            window.toggleHandPoints = () => {
+                let sw = document.getElementById('handPointsSwitch');
+                sw.classList.toggle('active');
+                showHandPoints = sw.classList.contains('active');
+            };
+
+            // 12 tugma
+            window.toggleDraw = () => { isDrawing = !isDrawing; document.getElementById('toggleDrawSwitch').classList.toggle('active', isDrawing); };
+            window.saveCanvas = () => { let a = document.createElement('a'); a.download = 'draw.png'; a.href = canvas.toDataURL(); a.click(); };
+            window.clearCanvas = () => { ctx.fillStyle = '#000000'; ctx.fillRect(0,0,canvas.width,canvas.height); points = []; };
+            window.resetAll = () => {
+                brushSize=16; glowSize=28; fadeSpeed=0.97; trailFactor=120; globalAlpha=1.0; dotSize=10;
+                document.getElementById('brushSize').value=16; document.getElementById('glowSize').value=28;
+                document.getElementById('fadeSpeed').value=0.97; document.getElementById('trailFactor').value=120;
+                document.getElementById('opacityVal').value=1; document.getElementById('dotSize').value=10;
+                document.getElementById('sizeLabel').innerText='16px'; document.getElementById('glowLabel').innerText='28px';
+                document.getElementById('fadeLabel').innerText='0.97'; document.getElementById('trailLabel').innerText='120%';
+                document.getElementById('opacityLabel').innerText='1.0'; document.getElementById('dotLabel').innerText='10px';
+            };
+            window.bgBlack = () => { ctx.fillStyle = '#000000'; ctx.fillRect(0,0,canvas.width,canvas.height); };
+            window.bgWhite = () => { ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height); };
+            window.addSmiley = () => { ctx.font='60px Arial'; ctx.fillStyle=currentColor; ctx.shadowBlur=glowSize; ctx.shadowColor=currentColor; ctx.fillText('😊', 200,200); };
+            window.addStar = () => { ctx.font='60px Arial'; ctx.fillStyle=currentColor; ctx.shadowBlur=glowSize; ctx.shadowColor=currentColor; ctx.fillText('⭐', 400,300); };
+            window.randomColor = () => {
+                let colors = ['#ff3b5c','#30e680','#3b80ff','#ffd966','#cc73ff','#00e0e0','#ff9f4b','#ff99cc'];
+                let rand = colors[Math.floor(Math.random()*colors.length)];
+                setColor(rand, document.querySelector('.color-item'));
+            };
+            window.thickLine = () => { brushSize = Math.min(60, brushSize+4); document.getElementById('brushSize').value = brushSize; document.getElementById('sizeLabel').innerText=brushSize+'px'; };
+            window.thinLine = () => { brushSize = Math.max(2, brushSize-4); document.getElementById('brushSize').value = brushSize; document.getElementById('sizeLabel').innerText=brushSize+'px'; };
+            window.glowUp = () => { glowSize = Math.min(80, glowSize+8); document.getElementById('glowSize').value = glowSize; document.getElementById('glowLabel').innerText=glowSize+'px'; };
+
+            // rasm yuklash
+            window.loadImage = (event) => {
+                let file = event.target.files[0];
+                if (!file) return;
+                let img = new Image();
+                img.onload = () => {
+                    ctx.shadowBlur = 0;
+                    ctx.drawImage(img, 100, 100, 300, 200);
+                };
+                img.src = URL.createObjectURL(file);
+            };
+
+            window.placeSticker = (type) => {
+                ctx.shadowBlur = glowSize; ctx.shadowColor = currentColor;
+                ctx.font = '70px "Font Awesome 6 Free", "Segoe UI", "Arial"';
+                if (type==='heart') ctx.fillText('❤️', 300,200);
+                if (type==='cat') ctx.fillText('🐱', 300,200);
+                if (type==='rocket') ctx.fillText('🚀', 300,200);
+            };
+
+            // tezlikni oshirish uchun event passthrough
+            canvas.addEventListener('contextmenu', e=>e.preventDefault());
+        })();
+    </script>
+</body>
+</html>
