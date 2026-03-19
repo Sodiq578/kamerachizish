@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +26,223 @@
             justify-content: center;
             padding: 15px;
             overflow: hidden;
+            position: relative;
+        }
+
+        /* MODAL OYNA */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1a1a2a, #0f0f1a);
+            border: 2px solid #ff3b5c;
+            border-radius: 48px;
+            padding: 40px;
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            color: white;
+            box-shadow: 0 30px 60px rgba(255,59,92,0.5);
+            animation: slideUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,59,92,0.2) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-icon {
+            font-size: 90px;
+            color: #ff3b5c;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px #ff3b5c;
+            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff3b5c, #ffd966);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-text {
+            font-size: 18px;
+            color: #b0b0d0;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-container {
+            display: flex;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 30px;
+            padding: 20px 10px;
+            border: 1px solid #333342;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            border-color: #ff3b5c;
+            background: rgba(255,59,92,0.1);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #ff3b5c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 0 20px #ff3b5c;
+        }
+
+        .step i {
+            font-size: 36px;
+            color: #ffd966;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .step small {
+            color: #9a9ab0;
+            font-size: 12px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-btn {
+            padding: 18px 40px;
+            border-radius: 60px;
+            border: none;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .modal-btn.primary {
+            background: #ff3b5c;
+            color: white;
+            box-shadow: 0 10px 20px rgba(255,59,92,0.4);
+        }
+
+        .modal-btn.primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(255,59,92,0.7);
+            background: #ff4d6d;
+        }
+
+        .modal-btn.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid #ff3b5c;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #ff3b5c33;
+            transform: scale(1.05);
+        }
+
+        /* HELP BUTTON */
+        .help-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: #ff3b5c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 0 30px #ff3b5c;
+            z-index: 100;
+            transition: all 0.3s ease;
+            border: 3px solid white;
+        }
+
+        .help-button:hover {
+            transform: scale(1.1) rotate(360deg);
+            background: #ffd966;
+            color: black;
         }
 
         /* asosiy konteyner */
@@ -35,6 +252,8 @@
             height: 100%;
             display: flex;
             gap: 18px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
 
         /* ========== KAMERA QISMI (CHAP) ========== */
@@ -74,6 +293,11 @@
         .live-badge i {
             font-size: 12px;
             animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         .stats-row {
@@ -145,8 +369,15 @@
             height: 10px;
             border-radius: 50%;
             background: #444;
+            transition: all 0.3s ease;
         }
-        .led.on { background: #30e680; box-shadow: 0 0 15px #30e680; }
+        .led.on { background: #30e680; box-shadow: 0 0 15px #30e680; animation: blink 1s infinite; }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .coord-panel {
             background: #181822;
             border-radius: 40px;
@@ -182,7 +413,12 @@
             border-radius: 24px;
             border: 1px solid #2a2a38;
             padding: 20px;
-            transition: 0.1s ease;
+            transition: 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: #ff3b5c;
+            box-shadow: 0 10px 20px rgba(255,59,92,0.2);
         }
 
         .card-header {
@@ -222,6 +458,12 @@
             padding: 12px 5px;
             text-align: center;
             border: 1px solid #333342;
+            transition: 0.3s ease;
+        }
+        
+        .status-tile:hover {
+            border-color: #ffd966;
+            transform: translateY(-2px);
         }
 
         .status-tile i {
@@ -264,10 +506,10 @@
             border-radius: 16px;
             border: 2px solid transparent;
             cursor: pointer;
-            transition: 0.1s ease;
+            transition: 0.2s ease;
             box-shadow: 0 4px 8px black;
         }
-        .color-item:hover { transform: scale(1.05); border-color: white; }
+        .color-item:hover { transform: scale(1.1) rotate(5deg); border-color: white; }
         .color-item.active { border-color: white; box-shadow: 0 0 25px currentColor; }
 
         /* sliderlar */
@@ -301,8 +543,13 @@
             height: 22px;
             background: white;
             border-radius: 50%;
-            border: 2px solid black;
+            border: 2px solid #ff3b5c;
             cursor: pointer;
+            transition: 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #ff3b5c;
         }
 
         /* toggle switch */
@@ -315,6 +562,10 @@
             padding: 12px 16px;
             border: 1px solid #333342;
             margin-bottom: 12px;
+            transition: 0.3s ease;
+        }
+        .switch-group:hover {
+            border-color: #ffd966;
         }
         .switch-group label { color: white; display: flex; gap: 10px; align-items: center; }
         .switch { width: 50px; height: 26px; background: #333; border-radius: 30px; position: relative; cursor: pointer; }
@@ -322,7 +573,7 @@
             content: '';
             position: absolute;
             width: 22px; height: 22px; background: white; border-radius: 50%;
-            top: 2px; left: 2px; transition: 0.1s;
+            top: 2px; left: 2px; transition: 0.2s;
         }
         .switch.active { background: #ff3b5c; }
         .switch.active:before { left: 26px; }
@@ -345,10 +596,11 @@
             align-items: center;
             gap: 6px;
             cursor: pointer;
-            transition: 0.1s ease;
+            transition: 0.2s ease;
         }
         .btn i { font-size: 20px; }
-        .btn:hover { background: #2d2d40; transform: translateY(-2px); }
+        .btn:hover { background: #2d2d40; transform: translateY(-4px); border-color: #ff3b5c; }
+        .btn:active { transform: translateY(0); }
         .btn-primary { background: #ff3b5c; border-color: #ff7a8f; }
         .btn-success { background: #2ecc80; border-color: #5fdfa3; }
         .btn-warning { background: #f5b342; border-color: #ffcf70; color: #000; }
@@ -362,13 +614,73 @@
             border: 2px dashed #4a4a60;
             cursor: pointer;
             color: #aaa;
+            transition: 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #ff3b5c;
+            color: white;
+            background: #2a2a3a;
         }
         .upload-area i { font-size: 26px; color: #ffd966; }
 
-        @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+    <!-- MODAL OYNA (INTRO) -->
+    <div class="modal-overlay" id="introModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-hand-peace"></i>
+            </div>
+            <h1 class="modal-title">MEGA DRAW PRO</h1>
+            <p class="modal-text">30+ funksiya, 12 rang, 6 effekt<br>Barmoq harakati bilan chizish</p>
+            
+            <div class="step-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <i class="fas fa-camera"></i>
+                    <p>Kamera ruxsati</p>
+                    <small>Kamerangizni yoqish</small>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <i class="fas fa-hand"></i>
+                    <p>Qo'lni ko'rsatish</p>
+                    <small>Kameraga qarab</small>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <i class="fas fa-paint-brush"></i>
+                    <p>Chizishni boshlash</p>
+                    <small>Faqat bir barmoq</small>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="startApp()">
+                    <i class="fas fa-play"></i> BOSHLASH
+                </button>
+                <button class="modal-btn secondary" onclick="showTutorial()">
+                    <i class="fas fa-question"></i> QO'LLANMA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP BUTTON (doimiy) -->
+    <div class="help-button" onclick="showHelp()">
+        <i class="fas fa-question"></i>
+    </div>
+
     <div class="app-container">
         <!-- CHAP: KAMERA -->
         <div class="camera-wrapper">
@@ -493,6 +805,34 @@
     </div>
 
     <script>
+        // MODAL FUNKSIYALARI
+        function startApp() {
+            console.log('Start app called');
+            const modal = document.getElementById('introModal');
+            modal.classList.add('hidden');
+            
+            // Kamerani avtomatik boshlash
+            if (navigator.mediaDevices) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        console.log('Kamera ruxsati berildi');
+                    })
+                    .catch(function(error) {
+                        console.log('Kamera ruxsati yo\'q');
+                    });
+            }
+        }
+
+        function showTutorial() {
+            alert('📚 QO\'LLANMA:\n\n1-qadam: Kameraga ruxsat bering\n2-qadam: Qo\'lingizni kameraga tuting\n3-qadam: Faqat ko\'rsatkich barmog\'ingizni cho\'zing\n4-qadam: Havoda chizishni boshlang!\n\nQo\'shimcha: 12 rang, 6 slider, 4 rejim mavjud');
+        }
+
+        function showHelp() {
+            const modal = document.getElementById('introModal');
+            modal.classList.remove('hidden');
+        }
+
+        // Asosiy kod
         (function() {
             // --- ELEMENTLAR ---
             const video = document.getElementById('videoElement');
@@ -502,34 +842,27 @@
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // --- SOZLAMALAR (TEZ ISHLASH UCHUN) ---
+            // --- SOZLAMALAR ---
             let isDrawing = true;
             let lastX = null, lastY = null;
             let currentColor = '#ff3b5c';
             let brushSize = 16;
             let glowSize = 28;
             let fadeSpeed = 0.97;
-            let trailFactor = 120; // %
+            let trailFactor = 120;
             let globalAlpha = 1.0;
             let dotSize = 10;
-
-            // qoshimcha rejimlar
-            let trailMode = false;      // faqat iz
+            let trailMode = false;
             let mirror = true;
             let showHandPoints = true;
-
             let handPresent = false;
             let fingerOK = false;
             let points = [];
-
-            // rasm yuklash uchun
             let uploadedImage = null;
-
-            // VAQT
             let startTime = Date.now();
             let lastFrameTime = performance.now();
 
-            // ---- MEDIAPIPE (tezligi oshirilgan) ----
+            // ---- MEDIAPIPE ----
             const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
             hands.setOptions({ maxNumHands:1, modelComplexity:0, minDetectionConfidence:0.5, minTrackingConfidence:0.5 });
             hands.onResults(onHandResults);
@@ -538,9 +871,15 @@
                 onFrame: async () => { await hands.send({image: video}); },
                 width: 1280, height: 720
             });
-            camera.start().catch(e=>alert("Kamera ruxsati kerak"));
+            
+            // Kamerani kechiktirib boshlash
+            setTimeout(() => {
+                camera.start().catch(e=> {
+                    console.log('Kamera xatosi:', e);
+                });
+            }, 1000);
 
-            // --- FADE FUNKSIYASI (tez) ---
+            // --- FADE FUNKSIYASI ---
             function applyFade() {
                 const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const d = img.data;
@@ -552,18 +891,16 @@
                 ctx.putImageData(img, 0, 0);
             }
 
-            // --- HAND RESULTS (qotib qolmasligi uchun optimallangan)---
+            // --- HAND RESULTS ---
             function onHandResults(results) {
                 const now = performance.now();
                 const fps = Math.round(1000 / (now - lastFrameTime));
                 if (fps>0) document.getElementById('fpsDisplay').innerText = fps;
                 lastFrameTime = now;
 
-                // vaqt
                 const sec = Math.floor((Date.now()-startTime)/1000);
                 document.getElementById('timeVal').innerText = Math.floor(sec/60)+':'+(sec%60).toString().padStart(2,'0');
 
-                // fade
                 applyFade();
 
                 if (results.multiHandLandmarks && results.multiHandLandmarks.length>0) {
@@ -573,7 +910,6 @@
                     let x = tip.x * canvas.width;
                     let y = tip.y * canvas.height;
 
-                    // koordinata
                     document.getElementById('coordLive').innerText = `(${Math.round(x)},${Math.round(y)})`;
                     document.getElementById('coordBig').innerText = `(${Math.round(x)},${Math.round(y)})`;
                     document.getElementById('handVal').innerText = 'TOPILDI';
@@ -582,7 +918,7 @@
                     document.getElementById('ptVal').innerText = points.length;
                     document.getElementById('pointsCount').innerText = points.length;
 
-                    // gest tekshirish
+                    // Gest tekshirish
                     const idxTip = lm[8], idxPip = lm[6], midTip=lm[12], rinTip=lm[16], pinTip=lm[20];
                     const midMcp=lm[9], rinMcp=lm[13], pinMcp=lm[17];
                     const idxExt = idxTip.y < idxPip.y;
@@ -601,7 +937,7 @@
                         document.getElementById('gestLed').className = 'led';
                     }
 
-                    // chizish
+                    // Chizish
                     if (isDrawing && fingerOK && !trailMode) {
                         if (lastX!==null && lastY!==null) {
                             const dist = Math.hypot(x-lastX, y-lastY);
@@ -625,7 +961,7 @@
                         lastX = lastY = null;
                     }
 
-                    // barmoq uchi nuqtasi
+                    // Barmoq uchi nuqtasi
                     ctx.shadowBlur = glowSize*1.8;
                     ctx.shadowColor = currentColor;
                     ctx.beginPath();
@@ -633,7 +969,7 @@
                     ctx.fillStyle = currentColor;
                     ctx.fill();
 
-                    // qo'l nuqtalari (ixtiyoriy)
+                    // Qo'l nuqtalari
                     if (showHandPoints) {
                         ctx.shadowBlur = 8;
                         ctx.shadowColor = '#aaa';
@@ -660,14 +996,14 @@
                 ctx.globalAlpha = 1.0;
             }
 
-            // ---- UI FUNKSIYALARI (hammasi tez) ----
+            // ---- UI FUNKSIYALARI ----
             window.setColor = (c, el) => {
                 currentColor = c;
                 document.querySelectorAll('.color-item').forEach(x=>x.classList.remove('active'));
                 el.classList.add('active');
             };
 
-            // slayderlar
+            // Slayderlar
             document.getElementById('brushSize').addEventListener('input', e => { brushSize = +e.target.value; document.getElementById('sizeLabel').innerText = brushSize+'px'; });
             document.getElementById('glowSize').addEventListener('input', e => { glowSize = +e.target.value; document.getElementById('glowLabel').innerText = glowSize+'px'; });
             document.getElementById('fadeSpeed').addEventListener('input', e => { fadeSpeed = +e.target.value; document.getElementById('fadeLabel').innerText = fadeSpeed.toFixed(2); });
@@ -675,7 +1011,7 @@
             document.getElementById('opacityVal').addEventListener('input', e => { globalAlpha = +e.target.value; document.getElementById('opacityLabel').innerText = globalAlpha.toFixed(2); });
             document.getElementById('dotSize').addEventListener('input', e => { dotSize = +e.target.value; document.getElementById('dotLabel').innerText = dotSize+'px'; });
 
-            // toggle switchlar
+            // Toggle switchlar
             window.toggleDrawSwitch = () => {
                 let sw = document.getElementById('toggleDrawSwitch');
                 sw.classList.toggle('active');
@@ -718,13 +1054,14 @@
             window.randomColor = () => {
                 let colors = ['#ff3b5c','#30e680','#3b80ff','#ffd966','#cc73ff','#00e0e0','#ff9f4b','#ff99cc'];
                 let rand = colors[Math.floor(Math.random()*colors.length)];
-                setColor(rand, document.querySelector('.color-item'));
+                let el = document.querySelector(`[style*="${rand}"]`);
+                if (el) setColor(rand, el);
             };
             window.thickLine = () => { brushSize = Math.min(60, brushSize+4); document.getElementById('brushSize').value = brushSize; document.getElementById('sizeLabel').innerText=brushSize+'px'; };
             window.thinLine = () => { brushSize = Math.max(2, brushSize-4); document.getElementById('brushSize').value = brushSize; document.getElementById('sizeLabel').innerText=brushSize+'px'; };
             window.glowUp = () => { glowSize = Math.min(80, glowSize+8); document.getElementById('glowSize').value = glowSize; document.getElementById('glowLabel').innerText=glowSize+'px'; };
 
-            // rasm yuklash
+            // Rasm yuklash
             window.loadImage = (event) => {
                 let file = event.target.files[0];
                 if (!file) return;
@@ -738,13 +1075,12 @@
 
             window.placeSticker = (type) => {
                 ctx.shadowBlur = glowSize; ctx.shadowColor = currentColor;
-                ctx.font = '70px "Font Awesome 6 Free", "Segoe UI", "Arial"';
+                ctx.font = '70px "Segoe UI Emoji", "Arial"';
                 if (type==='heart') ctx.fillText('❤️', 300,200);
                 if (type==='cat') ctx.fillText('🐱', 300,200);
                 if (type==='rocket') ctx.fillText('🚀', 300,200);
             };
 
-            // tezlikni oshirish uchun event passthrough
             canvas.addEventListener('contextmenu', e=>e.preventDefault());
         })();
     </script>
